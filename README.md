@@ -13,13 +13,13 @@ Restaurant Billing POS is a modern, efficient Point of Sale (POS) system designe
 ### 📸 Live Preview / Screenshots
 
 **New Order Page:**  
-![New Order Page](assets/images/demo/screenshot1.png)
+![New Order Page](assets/demo/screenshot1.png)
 
 **Admin Panel with Interactive Charts:**  
-![Admin Panel](assets/images/demo/screenshot3.png)
+![Admin Panel](assets/demo/screenshot3.png)
 
 **Generated PDF Invoice:**  
-![PDF Invoice](assets/images/demo/screenshot7.png)
+![PDF Invoice](assets/demo/screenshot7.png)
 
 ---
 
