@@ -68,6 +68,7 @@ Restaurant-Billing-POS/
 │   └── menu.csv        # Menu data in CSV format
 ├── assets/
 │   └── images/         # Menu item images (e.g., Margherita Pizza.jpg)
+│   └── demo/           # Screenshots for README (e.g., screenshot1.png)
 └── db/
     └── restaurant.db   # SQLite database (auto-created)
 ```
@@ -87,7 +88,7 @@ git clone https://github.com/VP7985/restaurant-billing.git
 cd Restaurant-Billing-POS
 ```
 
-*(Note: Replace `VP7985` with your actual GitHub username.)*
+*(Note: The repository name is `restaurant-billing`, but the local folder should be `Restaurant-Billing-POS`.)*
 
 #### 3. Create a `requirements.txt` File
 Create a file named `requirements.txt` in the project root with the following content:
@@ -116,6 +117,7 @@ pip install -r requirements.txt
   4,Steak,25.50,Main Courses,assets/images/Steak.jpg
   ```
 - Create an `assets/images` folder and place menu item images (e.g., `Cheesy Garlic Bread.jpg`) referenced in `menu.csv`.
+- Create an `assets/demo` folder for screenshots (e.g., `screenshot1.png`, `screenshot3.png`, `screenshot7.png`).
 
 #### 6. Run the Application
 Launch the Streamlit server:
@@ -126,16 +128,19 @@ python -m streamlit run app.py
 
 Your browser will open to the application at `http://localhost:8501`.
 
+---
 
+### 🖼️ Adding Screenshots
+To add screenshots:
+1. Take screenshots of the **New Order** page, **Admin Panel**, and a **generated PDF bill**.
+2. Save them as `screenshot1.png`, `screenshot3.png`, and `screenshot7.png` in `assets/demo/`.
+3. Ensure the `assets/demo/` folder exists.
 
 ---
 
 ### 👨‍💻 Developed By
 
-**Your Name**
+**VP7985**
 
 - **GitHub**: [https://github.com/VP7985](https://github.com/VP7985)
 
-
-
----
