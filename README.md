@@ -83,7 +83,7 @@ Follow these steps to set up and run Restaurant Billing POS on your local machin
 
 #### 2. Clone the Repository
 ```bash
-git clone https://github.com/VP7985/Restaurant-Billing-POS.git
+git clone https://github.com/VP7985/restaurant-billing.git
 cd Restaurant-Billing-POS
 ```
 
