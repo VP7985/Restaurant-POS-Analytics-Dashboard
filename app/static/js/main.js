@@ -28,8 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---- DASHBOARD & CART LOGIC ----
     const menuGrid = document.getElementById('menu-grid');
-    if (!menuGrid) return;
+    if (!menuGrid) return; // Exit if not on the dashboard page
 
+    // --- Element Selectors ---
     const cartItemsTableBody = document.querySelector('#cart-items');
     const cartSubtotalEl = document.getElementById('cart-subtotal');
     const cartGstEl = document.getElementById('cart-gst');
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const phoneError = document.getElementById('phone-error');
     const submitOrderBtn = document.getElementById('submit-order-btn');
 
+    // --- State Variables ---
     let cart = [];
     let orderType = 'Dine-In';
     const GST_RATE = 0.05;
@@ -61,26 +63,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (clearCartBtn) clearCartBtn.addEventListener('click', clearCart);
     
-    // Open the custom modal instead of prompt
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
-            if (cart.length > 0) {
-                customerModal.classList.remove('hidden');
-            }
+            if (cart.length > 0) customerModal.classList.remove('hidden');
         });
     }
 
-    // Close the modal
     if (cancelModalBtn) {
-        cancelModalBtn.addEventListener('click', () => {
-            customerModal.classList.add('hidden');
-        });
+        cancelModalBtn.addEventListener('click', () => customerModal.classList.add('hidden'));
     }
 
-    // Phone number validation
     if (customerPhoneInput) {
         customerPhoneInput.addEventListener('input', () => {
-            const phone = customerPhoneInput.value.replace(/\D/g, ''); // Allow only digits
+            const phone = customerPhoneInput.value.replace(/\D/g, '');
             customerPhoneInput.value = phone;
             if (phone.length === 10) {
                 phoneError.classList.add('hidden');
@@ -92,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle the final order submission from the modal
     if (customerForm) {
         customerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -100,28 +94,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = formData.get('name');
             const phone = formData.get('phone');
             
-            // This is the main fix for the JSON error
             try {
                 const response = await fetch('/api/order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // The payload is simplified, the backend calculates the total
                     body: JSON.stringify({ cart, name, phone, orderType })
                 });
 
-                // Check if the response is valid JSON before parsing
-                const responseText = await response.text();
-                if (!response.ok) {
-                    // Try to parse error JSON, otherwise show the raw text
-                    try {
-                        const errorResult = JSON.parse(responseText);
-                        throw new Error(errorResult.error || 'An unknown error occurred.');
-                    } catch {
-                        throw new Error(`Server returned an error page. Status: ${response.status}`);
-                    }
-                }
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'An unknown server error occurred.');
                 
-                const result = JSON.parse(responseText);
                 if (result.success) {
                     window.location.href = `/payment?order_id=${result.order_id}&total=${result.total}`;
                 } else {
@@ -137,16 +119,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Core Functions ---
     function updateCartUI() {
         if (!cartItemsTableBody) return;
+        checkoutBtn.disabled = cart.length === 0;
         if (cart.length === 0) {
             cartItemsTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-slate-400 h-[72px] px-4 py-2">Your cart is empty.</td></tr>';
-            if(checkoutBtn) checkoutBtn.disabled = true;
+            cartSubtotalEl.textContent = '₹0.00';
+            cartGstEl.textContent = '₹0.00';
+            cartTotalEl.textContent = '₹0.00';
         } else {
             cartItemsTableBody.innerHTML = '';
             let subtotal = 0;
             cart.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = 'border-t border-slate-700';
-                row.innerHTML = `<td class="h-[72px] px-4 py-2 text-slate-400">${item.name}</td><td class="h-[72px] px-4 py-2 text-slate-400">${item.quantity}</td><td class="h-[72px] px-4 py-2 text-slate-400">₹${(item.price * item.quantity).toFixed(2)}</td>`;
+                row.innerHTML = `<td class="h-[72px] px-4 py-2 text-slate-400">${item.name}</td><td class="h-[72px] px-4 py-2 text-slate-400">${item.quantity}</td><td class="h-[72px] px-4 py-2 text-slate-400 text-right">₹${(item.price * item.quantity).toFixed(2)}</td>`;
                 cartItemsTableBody.appendChild(row);
                 subtotal += item.price * item.quantity;
             });
@@ -154,17 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
             cartSubtotalEl.textContent = `₹${subtotal.toFixed(2)}`;
             cartGstEl.textContent = `₹${gst.toFixed(2)}`;
             cartTotalEl.textContent = `₹${(subtotal + gst).toFixed(2)}`;
-            if(checkoutBtn) checkoutBtn.disabled = false;
         }
     }
 
     function addToCart(item) {
         const existingItem = cart.find(cartItem => cartItem.id === item.id);
-        if (existingItem) {
-            existingItem.quantity++;
-        } else {
-            cart.push({ ...item, quantity: 1 });
-        }
+        if (existingItem) existingItem.quantity++;
+        else cart.push({ ...item, quantity: 1 });
         updateCartUI();
     }
 
@@ -177,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         menuGrid.innerHTML = '<p class="col-span-full text-center text-gray-600 dark:text-gray-400">Loading menu...</p>';
         try {
             const response = await fetch('/api/menu');
-            if (!response.ok) throw new Error(`Network response was not ok (${response.status})`);
+            if (!response.ok) throw new Error(`Network error`);
             const menuItems = await response.json();
             
             menuGrid.innerHTML = '';
@@ -185,13 +166,18 @@ document.addEventListener('DOMContentLoaded', () => {
             menuItems.forEach(item => {
                 const menuItemEl = document.createElement('div');
                 menuItemEl.className = 'flex flex-col gap-3 pb-3 cursor-pointer group';
-                menuItemEl.innerHTML = `<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg shadow-lg transform group-hover:scale-105 transition-transform duration-300" style="background-image: url('${item.image_path}');"></div><div><p class="font-medium text-gray-800 dark:text-gray-50">${item.name}</p><p class="text-sm text-gray-600 dark:text-gray-400">₹${item.price.toFixed(2)}</p></div>`;
+                menuItemEl.innerHTML = `
+                    <div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg shadow-lg transform group-hover:scale-105 transition-transform duration-300" 
+                         style="background-image: url('${item.image_path}');"></div>
+                    <div>
+                        <p class="font-medium text-gray-800 dark:text-gray-50">${item.name}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">₹${item.price.toFixed(2)}</p>
+                    </div>`;
                 menuItemEl.addEventListener('click', () => addToCart(item));
                 menuGrid.appendChild(menuItemEl);
             });
         } catch (error) {
-            console.error('Failed to load menu:', error);
-            menuGrid.innerHTML = '<p class="col-span-full text-center text-red-400">Failed to load menu. Please ensure the server is running and try again.</p>';
+            menuGrid.innerHTML = '<p class="col-span-full text-center text-red-400">Failed to load menu.</p>';
         }
     }
 
