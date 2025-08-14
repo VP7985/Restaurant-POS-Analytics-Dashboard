@@ -140,22 +140,22 @@ It is intended **only for demonstration and testing purposes**.
 ## 📸 Live Preview / Screenshots
 
 **Main Page:**  
-![PDF Invoice](demo\main.png)
+![PDF Invoice](demo/main.png)
 
 **Dashboard Page:**  
-![PDF Invoice](demo\default_user.png)
+![PDF Invoice](demo/default_user.png)
 
 **Menu List cart:**  
-![PDF Invoice](demo\menu.png)
+![PDF Invoice](demo/menu.png)
 
 **Get User Details:**  
-![PDF Invoice](demo\popup_user_details.png)
+![PDF Invoice](demo/popup_user_details.png)
 
 **UPI Payment:**  
-![PDF Invoice](demo\upi_fake_payment_number.png)
+![PDF Invoice](demo/upi_fake_payment_number.png)
 
 **Card Payment:**  
-![PDF Invoice](demo\card_fake_payment.png)
+![PDF Invoice](demo/card_fake_payment.png)
 
 **Payment Success:**  
-![PDF Invoice](demo\success_payment.png)
+![PDF Invoice](demo/success_payment.png)
