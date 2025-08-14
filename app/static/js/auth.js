@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const data = Object.fromEntries(formData.entries());
 
         try {
-            // Corrected URL with the blueprint prefix
             const response = await fetch('/auth/api/admin/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
