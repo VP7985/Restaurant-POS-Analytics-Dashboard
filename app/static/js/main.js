@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ---- THEME SWITCHER LOGIC ----
-    const themeSwitcher = document.getElementById('theme-switcher');
     const htmlElement = document.documentElement;
 
     const applyTheme = (theme) => {
@@ -16,15 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     applyTheme(savedTheme);
-
-    if (themeSwitcher) {
-        themeSwitcher.addEventListener('click', () => {
-            const newTheme = htmlElement.classList.contains('dark') ? 'light' : 'dark';
-            localStorage.setItem('theme', newTheme);
-            applyTheme(newTheme);
-            fetch(`/theme/${newTheme}`);
-        });
-    }
 
     // ---- DASHBOARD & CART LOGIC ----
     const menuGrid = document.getElementById('menu-grid');
