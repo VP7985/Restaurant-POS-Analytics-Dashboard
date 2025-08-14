@@ -1,44 +1,37 @@
 {% extends "layouts/base.html" %}
 {% set title = "Admin Panel" %}
-
 {% block content %}
-<div class="px-4 md:px-10 flex flex-1 justify-center py-5">
-    <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-        <div class="flex flex-wrap justify-between gap-3 p-4">
-            <p class="text-gray-800 dark:text-white tracking-light text-3xl font-bold leading-tight min-w-72">Menu Management</p>
-        </div>
-        <div class="px-4 py-3">
-            <div class="flex overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-                <table class="flex-1">
-                    <thead class="bg-gray-100 dark:bg-slate-700">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-gray-800 dark:text-white w-2/5 text-sm font-medium">Name</th>
-                            <th class="px-4 py-3 text-left text-gray-800 dark:text-white w-1/5 text-sm font-medium">Category</th>
-                            <th class="px-4 py-3 text-left text-gray-800 dark:text-white w-1/5 text-sm font-medium">Price</th>
-                            <th class="px-4 py-3 text-left text-gray-800 dark:text-white w-1/5 text-sm font-medium">Availability</th>
+<div class="max-w-7xl mx-auto">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-50 mb-4">Admin Panel</h2>
+    <div class="space-y-8">
+        <div>
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-50 mb-4">Menu Management</h3>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-700">
+                            <th class="p-3">Name</th>
+                            <th class="p-3">Category</th>
+                            <th class="p-3">Price</th>
+                            <th class="p-3">Availability</th>
                         </tr>
                     </thead>
-                    <tbody id="menu-table-body">
-                        </tbody>
+                    <tbody id="menu-table-body"></tbody>
                 </table>
             </div>
         </div>
-
-        <h2 class="text-gray-800 dark:text-white text-2xl font-bold px-4 pb-3 pt-8">Import/Export</h2>
-        <div class="p-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800">
-            <div class="grid md:grid-cols-2 gap-6">
-                <form id="uploadCsvForm">
-                    <label class="block mb-2 font-semibold text-gray-700 dark:text-slate-300">Import Menu (CSV)</label>
-                    <input type="file" name="file" accept=".csv" required class="block w-full text-sm text-gray-700 dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-100 dark:file:bg-sky-900/50 file:text-sky-700 dark:file:text-sky-300 hover:file:bg-sky-200 dark:hover:file:bg-sky-900"/>
-                    <button type="submit" class="mt-2 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded-lg">Upload</button>
-                </form>
-                <div>
-                    <label class="block mb-2 font-semibold text-gray-700 dark:text-slate-300">Export Menu (CSV)</label>
-                    <a href="{{ url_for('api.download_menu') }}" class="mt-2 inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Download</a>
-                </div>
-            </div>
-            <p id="csv-message" class="mt-4 text-sm"></p>
+        <div>
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-50 mb-4">Import/Export Menu</h3>
+            <form id="uploadCsvForm" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+                <input type="file" accept=".csv" name="file" class="mb-4 text-gray-600 dark:text-gray-400">
+                <button type="submit" class="bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600">Import Menu (CSV)</button>
+                <a href="{{ url_for('api.download_menu') }}" class="ml-4 inline-block bg-green-600 dark:bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-700 dark:hover:bg-green-600">Export Menu (CSV)</a>
+                <p id="csv-message" class="mt-4 text-sm"></p>
+            </form>
         </div>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
