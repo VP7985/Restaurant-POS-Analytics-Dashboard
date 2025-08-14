@@ -1,146 +1,161 @@
-# Restaurant Billing POS
+# 🍽 Restaurant POS & Analytics Dashboard
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.9+-blue.svg" alt="Python Version">
-  <img src="https://img.shields.io/badge/Framework-Streamlit-red" alt="Framework">
-  <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
-</p>
+## 📌 Overview
+This is a **full-stack restaurant Point of Sale (POS) system** built with **Flask** and **SQLite**, featuring:
+- **Order Management**
+- **Fake Payment Confirmation** for UPI, Card, and Cash (demo simulation only)
+- **Invoice Generation**
+- **Menu Management**
+- **Professional Sales Analytics Dashboard** with interactive charts
+- **CSV Exports** for sales reports
 
-Restaurant Billing POS is a modern, efficient Point of Sale (POS) system designed for restaurants. Built with Python and Streamlit, it features a sleek, light-themed web interface with a light pink background (#fdf2f2) and red accents (#e92933), inspired by a professional HTML design. The system provides seamless order management, real-time bill calculations, and insightful sales analytics.
-
----
-
-### 📸 Live Preview / Screenshots
-
-**New Order Page:**  
-![New Order Page](assets/demo/screenshot1.png)
-
-**Admin Panel with Interactive Charts:**  
-![Admin Panel](assets/demo/screenshot3.png)
-
-**Generated PDF Invoice:**  
-![PDF Invoice](assets/demo/screenshot7.png)
+It is designed for **real-time order handling** in restaurants, cafés, or takeaway businesses, and includes a **secure admin panel** for menu and sales analytics.
 
 ---
 
-### ✨ Key Features
+## 🏗 Project Structure
+The project is organized into several main directories and files:
 
-- **Modern Light-Themed UI**: Clean, responsive interface using the "Plus Jakarta Sans" font, with a light pink background and red accents.
-- **Real-time Billing**: Instantly update bills with subtotal, 10% tax, discounts, and special requests as items are added.
-- **Interactive Menu**: Tabbed menu organized by category, featuring 100x100px clickable item cards with images on the right.
-- **PDF Bill Export**: Generate and download professional, itemized invoices for each order.
-- **Comprehensive Admin Dashboard**:
-  - Display key performance indicators (KPIs) such as total sales, total orders, and average sale value.
-  - Visualize sales trends with interactive **pie charts** and **line graphs** powered by Plotly.
-  - Filter reports by **Daily, Weekly, or Monthly** periods.
-- **Easy Menu Management**: Upload a `menu.csv` file to the `data` folder to update the restaurant menu.
-- **Flexible Data Storage**: Supports SQLite database for persistent storage and CSV-based menu management in the `data` folder.
-- **Order Management**: Handle dine-in and takeaway orders with payment options (Cash, Card, UPI) and intuitive quantity controls.
-
----
-
-### 🛠️ Tech Stack
-
-- **Backend**: Python
-- **Frontend / Web Framework**: Streamlit
-- **Database**: SQLite3
-- **Data Manipulation**: Pandas
-- **Charting / Visualization**: Plotly Express
-- **PDF Generation**: FPDF
-
----
-
-### 📂 Folder Structure
-
-The project is organized for modularity and maintainability:
-
-```
-Restaurant-Billing-POS/
-├── app.py              # Main application launcher
-├── requirements.txt    # Project dependencies
-├── ui/
-│   └── main_ui.py      # Streamlit UI code with light-themed design
-├── utils/
-│   ├── db_utils.py     # Database and CSV interactions
-│   ├── calculator.py   # Billing calculations
-│   └── pdf_generator.py # PDF bill generation
-├── data/
-│   └── menu.csv        # Menu data in CSV format
-├── assets/
-│   └── images/         # Menu item images (e.g., Margherita Pizza.jpg)
-│   └── demo/           # Screenshots for README (e.g., screenshot1.png)
-└── db/
-    └── restaurant.db   # SQLite database (auto-created)
-```
+- **`__pycache__/`** – Python cache files generated automatically.
+- **`app/`** – Main application folder containing all core logic:
+  - **`__init__.py`** – Initializes the Flask app and database.
+  - **`models/`** – Database models, including `models.py`.
+  - **`routes/`** – API and view routes, including:
+    - `api_routes.py` – Core API endpoints (orders, analytics, payments)
+    - `auth_routes.py` – Admin authentication endpoints
+    - `view_routes.py` – Page rendering routes
+  - **`services/`** – Background services like `initial_setup.py`.
+  - **`static/`** – Static assets:
+    - CSS files
+    - Images
+    - JavaScript files (`admin.js`, `analytics.js`, `auth.js`, `main.js`, `payment.js`)
+  - **`templates/`** – HTML templates:
+    - Auth pages (`auth/`)
+    - Layout templates (`layouts/`)
+    - Main pages (`admin_panel.html`, `analytics.html`, `dashboard.html`, `payment.html`)
+  - **`utils/`** – Utility scripts like `pdf_generator.py` for invoice creation.
+- **`instance/`** – Contains the SQLite database (`restaurant.db`), invoice PDFs, and CSV exports.
+- **`config.py`** – Configuration settings for the Flask app.
+- **`generate_monthly_data.py`** – Script for generating sample monthly sales data.
+- **`requirements.txt`** – Python dependencies list.
+- **`run.py`** – Application entry point for running the Flask server.
 
 ---
 
-### 🚀 Getting Started
+## 🚀 Features
+### 1️⃣ Order Management
+- Select menu items, quantities, and order type (**Dine-In**, **Takeaway**, **Delivery**)
+- Automatically calculates GST and final total
 
-Follow these steps to set up and run Restaurant Billing POS on your local machine.
+### 2️⃣ Fake Payment Confirmation (Demo Mode)
+- Supports **Cash**, **Card**, and **UPI**
+- All payment confirmations are **simulated** (no real transactions)
+- Payment details are stored for record-keeping
 
-#### 1. Prerequisites
-- Ensure **Python 3.9** or newer is installed.
+### 3️⃣ PDF Invoice Generation
+- Generates a professional invoice after payment
+- Stored in `/instance` for download
 
-#### 2. Clone the Repository
-```bash
-git clone https://github.com/VP7985/restaurant-billing.git
-cd Restaurant-Billing-POS
-```
+### 4️⃣ Admin Panel
+- Secure login for admins
+- Add, edit, delete, or bulk import/export menu items via CSV
 
-*(Note: The repository name is `restaurant-billing`, but the local folder should be `Restaurant-Billing-POS`.)*
-
-#### 3. Create a `requirements.txt` File
-Create a file named `requirements.txt` in the project root with the following content:
-
-```txt
-streamlit
-pandas
-plotly
-fpdf
-```
-
-#### 4. Install Dependencies
-Run the following command to install required libraries:
-
-```bash
-pip install -r requirements.txt
-```
-
-#### 5. Set Up the `data` and `assets` Folders
-- Create a `data` folder in the project root and add a `menu.csv` file with the following structure:
-  ```csv
-  id,name,price,category,image_path
-  1,Cheesy Garlic Bread,8.50,Appetizers,assets/images/Cheesy Garlic Bread.jpg
-  2,Margherita Pizza,18.00,Main Courses,assets/images/Margherita Pizza.jpg
-  3,Calamari,12.00,Appetizers,assets/images/Calamari.jpg
-  4,Steak,25.50,Main Courses,assets/images/Steak.jpg
-  ```
-- Create an `assets/images` folder and place menu item images (e.g., `Cheesy Garlic Bread.jpg`) referenced in `menu.csv`.
-- Create an `assets/demo` folder for screenshots (e.g., `screenshot1.png`, `screenshot3.png`, `screenshot7.png`).
-
-#### 6. Run the Application
-Launch the Streamlit server:
-
-```bash
-python -m streamlit run app.py
-```
-
-Your browser will open to the application at `http://localhost:8501`.
+### 5️⃣ Analytics Dashboard
+- **KPIs:** Total Sales, Total Orders, Average Order Value
+- **Charts:** Sales Trends, Order Type Distribution, Payment Methods, Top Selling Items
+- **Full Items Table** with quantities sold
+- **CSV Export** for sales reports
 
 ---
 
-### 🖼️ Adding Screenshots
-To add screenshots:
-1. Take screenshots of the **New Order** page, **Admin Panel**, and a **generated PDF bill**.
-2. Save them as `screenshot1.png`, `screenshot3.png`, and `screenshot7.png` in `assets/demo/`.
-3. Ensure the `assets/demo/` folder exists.
+## ⚙ Installation & Setup
+1. **Clone Repository**  
+   git clone https://github.com/yourusername/restaurant-pos.git  
+   cd restaurant-pos  
+
+2. **Create Virtual Environment**  
+   python -m venv venv  
+   source venv/bin/activate  # Mac/Linux  
+   venv\Scripts\activate     # Windows  
+
+3. **Install Dependencies**  
+   pip install -r requirements.txt  
+
+4. **Database Setup**  
+   flask shell  
+   from app import db  
+   db.create_all()  
+
+   *(Optional) Seed menu items:*  
+   python app/services/initial_setup.py  
+
+5. **Run Application**  
+   python run.py  
+
+Visit: **http://127.0.0.1:5000**
 
 ---
 
-### 👨‍💻 Developed By
+## 📂 API Endpoints
+| Method | Endpoint                        | Description              |
+| ------ | ------------------------------- | ------------------------ |
+| GET    | `/menu`                         | Fetch menu items         |
+| POST   | `/order`                        | Create new order         |
+| POST   | `/order/<id>/pay`               | Process **fake payment** |
+| GET    | `/analytics/dashboard`          | Fetch dashboard data     |
+| GET    | `/analytics/items-sales/export` | Export sales CSV         |
 
-**VP7985**
+---
 
-- **GitHub**: [https://github.com/VP7985](https://github.com/VP7985)
+## 🔒 Authentication
+- Admin login required for Analytics and Admin Panel
+- Uses `flask-login` for session handling
+- Passwords hashed with `bcrypt`
 
+---
+
+## 📦 Tech Stack
+**Backend:** Python, Flask, SQLAlchemy, SQLite  
+**Frontend:** HTML, TailwindCSS, JavaScript, Chart.js  
+**Auth:** Flask-Login, Bcrypt  
+**Reports:** CSV, PDF (ReportLab)
+
+---
+
+## 📌 Future Enhancements
+- Multi-branch support
+- Real-time WebSocket updates
+- Role-based permissions
+- AI sales forecasting
+
+---
+
+## ⚠️ Demo Disclaimer
+This project includes **fake payment confirmation** for UPI, Card, and Cash.  
+No actual transactions occur, and no payment gateways are integrated.  
+It is intended **only for demonstration and testing purposes**.
+
+---
+
+## 📸 Live Preview / Screenshots
+
+**Main Page:**  
+![PDF Invoice](demo\main.png)
+
+**Dashboard Page:**  
+![PDF Invoice](demo\default_user.png)
+
+**Menu List cart:**  
+![PDF Invoice](demo\menu.png)
+
+**Get User Details:**  
+![PDF Invoice](demo\popup_user_details.png)
+
+**UPI Payment:**  
+![PDF Invoice](demo\upi_fake_payment_number.png)
+
+**Card Payment:**  
+![PDF Invoice](demo\card_fake_payment.png)
+
+**Payment Success:**  
+![PDF Invoice](demo\success_payment.png)
