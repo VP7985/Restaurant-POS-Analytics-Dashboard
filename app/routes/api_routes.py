@@ -183,27 +183,151 @@ def download_menu():
         'Content-Disposition': 'attachment; filename=menu_export.csv',
         'Content-Type': 'text/csv'
     }
-
-
-@api_bp.route('/analytics/sales-over-time', methods=['GET'])
+@api_bp.route('/analytics/dashboard', methods=['GET'])
 @login_required
-def sales_over_time():
-    # Example: Sales for the last 7 days
-    labels = []
-    data = []
-    today = datetime.utcnow().date()
-    for i in range(6, -1, -1):
-        day = today - timedelta(days=i)
-        start_of_day = datetime.combine(day, datetime.min.time())
-        end_of_day = datetime.combine(day, datetime.max.time())
-        
-        daily_sales = db.session.query(db.func.sum(Order.total_amount)).filter(
-            Order.status == 'paid',
-            Order.timestamp >= start_of_day,
-            Order.timestamp <= end_of_day
-        ).scalar() or 0
-        
-        labels.append(day.strftime('%b %d'))
-        data.append(daily_sales)
-        
-    return jsonify({'labels': labels, 'data': data})
+def analytics_dashboard():
+    range_param = request.args.get('range', '7d')
+
+    if range_param == '1d':
+        start_date = datetime.utcnow() - timedelta(days=1)
+        group_by_hour = True
+    elif range_param == '30d':
+        start_date = datetime.utcnow() - timedelta(days=30)
+        group_by_hour = False
+    else:
+        start_date = datetime.utcnow() - timedelta(days=7)
+        group_by_hour = False
+
+    total_sales = db.session.query(db.func.sum(Order.total_amount))\
+        .filter(Order.status == 'paid', Order.timestamp >= start_date)\
+        .scalar() or 0
+    total_orders = db.session.query(db.func.count(Order.id))\
+        .filter(Order.status == 'paid', Order.timestamp >= start_date)\
+        .scalar() or 0
+    avg_order_value = total_sales / total_orders if total_orders > 0 else 0
+
+    labels, data = [], []
+    if group_by_hour:
+        for hour in range(24):
+            start_time = start_date.replace(hour=hour, minute=0, second=0, microsecond=0)
+            end_time = start_time + timedelta(hours=1)
+            sales_sum = db.session.query(db.func.sum(Order.total_amount)).filter(
+                Order.status == 'paid',
+                Order.timestamp >= start_time,
+                Order.timestamp < end_time
+            ).scalar() or 0
+            labels.append(start_time.strftime('%H:00'))
+            data.append(sales_sum)
+    else:
+        total_days = int(range_param.replace('d', '')) if range_param.endswith('d') else 7
+        today = datetime.utcnow().date()
+        for i in range(total_days - 1, -1, -1):
+            day = today - timedelta(days=i)
+            start_of_day = datetime.combine(day, datetime.min.time())
+            end_of_day = datetime.combine(day, datetime.max.time())
+            daily_sales = db.session.query(db.func.sum(Order.total_amount)).filter(
+                Order.status == 'paid',
+                Order.timestamp >= start_of_day,
+                Order.timestamp <= end_of_day
+            ).scalar() or 0
+            labels.append(day.strftime('%b %d'))
+            data.append(daily_sales)
+
+    sales_trends = {'labels': labels, 'data': data}
+
+    order_type_results = db.session.query(
+        Order.order_type,
+        db.func.sum(Order.total_amount)
+    ).filter(Order.status == 'paid', Order.timestamp >= start_date)\
+     .group_by(Order.order_type).all()
+    order_type = {
+        'labels': [r[0] for r in order_type_results],
+        'values': [float(r[1] or 0) for r in order_type_results]
+    }
+
+    payment_results = db.session.query(
+        PaymentTransaction.payment_method,
+        db.func.sum(Order.total_amount)
+    ).join(Order, PaymentTransaction.order_id == Order.id)\
+     .filter(Order.status == 'paid', Order.timestamp >= start_date)\
+     .group_by(PaymentTransaction.payment_method).all()
+    payment_methods = {
+        'labels': [r[0] for r in payment_results],
+        'values': [float(r[1] or 0) for r in payment_results]
+    }
+
+    top_items_results = db.session.query(
+        MenuItem.name,
+        db.func.sum(OrderItem.quantity)
+    ).join(OrderItem, MenuItem.id == OrderItem.menu_item_id)\
+     .join(Order, OrderItem.order_id == Order.id)\
+     .filter(Order.status == 'paid', Order.timestamp >= start_date)\
+     .group_by(MenuItem.name)\
+     .order_by(db.func.sum(OrderItem.quantity).desc())\
+     .limit(10).all()
+    top_items = {
+        'labels': [r[0] for r in top_items_results],
+        'values': [int(r[1] or 0) for r in top_items_results]
+    }
+
+    all_items_results = db.session.query(
+        MenuItem.name,
+        db.func.sum(OrderItem.quantity)
+    ).join(OrderItem, MenuItem.id == OrderItem.menu_item_id)\
+     .join(Order, OrderItem.order_id == Order.id)\
+     .filter(Order.status == 'paid', Order.timestamp >= start_date)\
+     .group_by(MenuItem.name)\
+     .order_by(db.func.sum(OrderItem.quantity).desc())\
+     .all()
+    all_items = {
+        'labels': [r[0] for r in all_items_results],
+        'values': [int(r[1] or 0) for r in all_items_results]
+    }
+
+    return jsonify({
+        'kpis': {
+            'total_sales': float(total_sales),
+            'total_orders': total_orders,
+            'avg_order_value': float(avg_order_value)
+        },
+        'sales_trends': sales_trends,
+        'order_type': order_type,
+        'payment_methods': payment_methods,
+        'top_items': top_items,
+        'all_items': all_items
+    })
+
+
+@api_bp.route('/analytics/items-sales/export', methods=['GET'])
+@login_required
+def export_items_sales_csv():
+    range_param = request.args.get('range', '7d')
+
+    if range_param == '1d':
+        start_date = datetime.utcnow() - timedelta(days=1)
+    elif range_param == '30d':
+        start_date = datetime.utcnow() - timedelta(days=30)
+    else:
+        start_date = datetime.utcnow() - timedelta(days=7)
+
+    results = db.session.query(
+        MenuItem.name,
+        db.func.sum(OrderItem.quantity)
+    ).join(OrderItem, MenuItem.id == OrderItem.menu_item_id)\
+     .join(Order, OrderItem.order_id == Order.id)\
+     .filter(Order.status == 'paid', Order.timestamp >= start_date)\
+     .group_by(MenuItem.name)\
+     .order_by(db.func.sum(OrderItem.quantity).desc())\
+     .all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Item Name', 'Quantity Sold'])
+    for name, qty in results:
+        writer.writerow([name, int(qty or 0)])
+
+    output.seek(0)
+    return output.getvalue(), 200, {
+        'Content-Disposition': f'attachment; filename=items_sales_{range_param}.csv',
+        'Content-Type': 'text/csv'
+    }
