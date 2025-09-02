@@ -70,7 +70,7 @@ The project is organized into several main directories and files:
 
 ## ⚙ Installation & Setup
 1. **Clone Repository**  
-   git clone https://github.com/yourusername/restaurant-pos.git  
+   git clone https://github.com/VP7985/Restaurant-POS-Analytics-Dashboard.git 
    cd restaurant-pos  
 
 2. **Create Virtual Environment**  
